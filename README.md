@@ -1,5 +1,7 @@
 # Smart Waypoints
 
+Download at [the mod portal](https://mods.factorio.com/mod/smart-waypoints), or search for it in game! (>= 0.17 required)
+
 Smart Waypoints is a mod that enables waypoints with special names to control trains that go by, skipping around their schedule.
 
 This mod does not add any new items or technologies to the game, its functionality is available from the first train stop you build. Smart Waypoints are any train stops that start with the default delimiter of `/`. This means in most worlds, you can just add Smart Waypoints without trouble. The mod does minimal processing
