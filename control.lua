@@ -2,7 +2,7 @@ local config = {
 	disable_on_error    = false, -- If true, stops that cause errors will be renamed to disable them.
 	trains_can_print    = true,  -- If true, orders will have access to print.
 	bad_index_is_error  = false, -- If true, if an order tries to jump to an non-existent order, it counts as an error.
-	debug_orders        = true,  -- If true, orders will indicate status and action whenever they run.
+	debug_orders        = false, -- If true, orders will indicate status and action whenever they run.
 	delimiter           = "/",   -- The prefix and separator to use for smart waypoint orders.
 	disable_prefix      = "# ",  -- The prefix added to a station name to disable it.
 }
