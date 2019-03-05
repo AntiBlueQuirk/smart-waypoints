@@ -44,6 +44,8 @@ These are the actions you can use:
  - `//`
    - The script can return anything. The action does nothing.
 
+In addition, you may prefix the action with `!`. This will cause the result of the order to always be printed, as if debug_orders was true in the config.
+
 Note that actions that require numbers cannot be used with Direct Orders. (Orders that omit a script.) Leading and trailing whitespace is removed from actions before parsing, so you may put padding around them if you would like.
 
 ## Scripts
@@ -130,9 +132,25 @@ As the train passes stops 1 and 2, it will decide to which of stations 3, 5, and
    - Skip to the next schedule stop named 'Fuel Up'
  - `/+2/item_count() > 100`
    - "If carrying any cargo, skip the next schedule stop."
- - `//print("I'm going " .. speed " km/h")
+ - `//print("I'm going " .. speed " km/h")`
    - "The train prints its speed as it goes by."
  - `/=1/signal('signal-R') > 0`
    - "If there is any Signal R at the stop, go to stop 1."
- - `/1/id == 22`
-   - "If this is train 22, go to stop 1."
+ - `/!1/id == 22`
+   - "If this is train 22, go to stop 1. Always print the result as if debug mode was on."
+ - `/`
+   - "Always succeeds at doing nothing."
+
+## FAQ
+
+ - Why is it all so clunky?
+   - The game's API for controlling train schedules is pretty narrow, and there's no way to modify the vanilla train UI. So I came up with the waypoint system instead.
+ - My order doesn't work, but I'm not seeing an error.
+   - Depending on the kind of order, it may be silently failing. This can happen if you're using absolute stop actions, but the number you gave was out of range. Try prefixing your action with `!`, which will cause the result of the order to printed when it happens.
+ - Future plans?
+   - Well, I'd like the method for setting orders to be cleaner, but that would require some changes to the game. For one, you would need to be able to specify names for non-existent stations. Second, the game would have to not just skip over non-existent stations, even if it was only for a frame. At the very least some sort of "train-schedule-updated" event would be necessary. Beyond that, it would be nice to expand the capabilities of scripts, for instance, allowing them to send signals as well as receive them.
+   - I've also had an idea for another way to go about this, and just attach full Lua scripts to trains. That would allow fully programmable trains, but it would be far more technical than even this mod is.
+ - API/feature requests for the devs?
+   - `train-schedule-updated` event, or something like it, that triggers whenever a train picks a new destination. This would optimize the mod quite a bit, since I wouldn't have to poll trains for schedule changes.
+   - Allow setting schedule destinations manually, so the user can type whatever they want. Also, don't skip non-existent stations immediately, wait a frame at least so events can trigger and respond. This would mean that placing stops would be unnecessary, and train schedules and stop names wouldn't be coupled together the ugly way they are now. The entire script could be managed from the train screen.
+   - Or just add conditional goto orders. :)

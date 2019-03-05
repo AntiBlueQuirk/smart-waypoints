@@ -370,14 +370,22 @@ function do_stop_passed_logic(ts, old_si)
 		end
 		
 		local param = stop_name:sub(2, lua_start-1)
-		param = param:match('^%s*(.-)%s*$')
+		param = param:match('^%s*(.-)%s*$') --trim whitespace
+		
+		local debug_mode = param:sub(1,1) == "!"
+		if debug_mode then
+			param = param:sub(2)
+			param = param:match('^%s*(.*)') -- trim again, only leading space
+		end
+		debug_mode = debug_mode or config.debug_orders
+		
 		local paramf = param:sub(1,1)
 		
 		local lua_str
 		if not direct_mode then
 			lua_str = stop_name:sub(lua_start+1)
 			
-			-- trim lua here
+			lua_str = lua_str:match('^%s*(.-)%s*$')
 			if #lua_str == 0 then
 				direct_mode = true
 			else
@@ -411,7 +419,7 @@ function do_stop_passed_logic(ts, old_si)
 		elseif paramf == "'" then
 			mode = 2 -- `'X`: expecting boolean, if true, skip to next station with name X; yes, we're just reusing mode 2 here.
 			new_si = find_next_station_with_name(sch, param:sub(2), old_si)
-			if new_si == nil then
+			if new_si == nil and debug_mode then
 				train_print(ts, "Can't find station in schedule named "..param:sub(2))
 				new_si = 0
 			end
@@ -445,19 +453,23 @@ function do_stop_passed_logic(ts, old_si)
 				else
 					if mode == 1 then
 						res = res + old_si
-						while res < 1    do res = res + schc end
-						while res > schc do res = res - schc end
+						if res < -200 or res > 200 then -- cut off absurd results
+							res = 0
+						else
+							while res < 1    do res = res + schc end
+							while res > schc do res = res - schc end
+						end
 					end
 					
 					if res > 0 and res <= #sch.records then
 						ts.train.go_to_station(res)
 						ts.last_si = res
-						if config.debug_orders then
-							train_print(ts, stop_name.." returned "..tostring(orig_res)..": Skipped to "..res..".")
+						if debug_mode then
+							train_print(ts, stop_name .. " returned " .. tostring(orig_res) .. ": Skipped to =" .. res .. "/" .. sch.records[res].station .. ".")
 						end
 					else
-						if config.debug_orders then
-							train_print(ts, stop_name.." returned "..tostring(orig_res)..": Can't skip to "..res..", bad index.")
+						if debug_mode then
+							train_print(ts, stop_name .. " returned " .. tostring(orig_res) .. ": Can't skip to =" .. res .. ", bad index.")
 						end
 					end
 				end
@@ -466,33 +478,37 @@ function do_stop_passed_logic(ts, old_si)
 					res = new_si
 					if mode == 3 then
 						res = res + old_si
-						while res < 1    do res = res + schc end
-						while res > schc do res = res - schc end
+						if res < -200 or res > 200 then -- cut off absurd results
+							res = 0
+						else
+							while res < 1    do res = res + schc end
+							while res > schc do res = res - schc end
+						end 
 					end
 					
 					if res > 0 and res <= #(sch.records) then
 						ts.train.go_to_station(res)
 						ts.last_si = res
-						if config.debug_orders then
-							train_print(ts, stop_name.." returned "..tostring(orig_res)..": Skipped to "..res..".")
+						if debug_mode then
+							train_print(ts, stop_name .. " returned " .. tostring(orig_res) .. ": Skipped to =" .. res .. "/" .. sch.records[res].station .. ".")
 						end
 					else
 						if config.bad_index_is_error then
 							stop_error(stop_name, ts, "Train tried to go to bad index "..res..". (Action: "..param..")")
-						elseif config.debug_orders then
-							train_print(ts, stop_name.." returned "..tostring(orig_res)..": Can't skip to "..res..", bad index.")
+						elseif debug_mode then
+							train_print(ts, stop_name .. " returned " .. tostring(orig_res) .. ": Can't skip to =" .. res .. ", bad index.")
 						end
 					end
 				else
-					if config.debug_orders then
-						train_print(ts, stop_name.." returned "..tostring(orig_res)..": Not skipping.")
+					if debug_mode then
+						train_print(ts, stop_name .. " returned " .. tostring(orig_res) .. ": Not skipping.")
 					end
 				end
 			elseif mode == 4 then
-				if config.debug_orders then
-					train_print(ts, stop_name.." returned "..tostring(orig_res)..".")
+				if debug_mode then
+					train_print(ts, stop_name .. " returned " .. tostring(orig_res) .. ": No op.")
 				end
-			end -- else mode == 4
+			end
 		else
 			stop_error(stop_name, ts, "Error running lua: \""..res.."\".")
 		end
