@@ -354,7 +354,7 @@ function do_stop_passed_logic(ts, old_si)
 	local schc = #sch.records
 	
 	local old_stop = sch.records[old_si]
-	local stop_name = old_stop.station
+	local stop_name = old_stop and old_stop.station or ""
 	local stop_namef = stop_name:sub(1,1)
 	local direct_mode = false
 	ts.last_station = stop_name
@@ -520,7 +520,7 @@ function do_train_check(ts)
 	if sch then
 		local new_si = sch.current
 		local old_si = ts.last_si
-		if not old_si then
+		if not old_si or old_si >= #sch.records then
 			ts.last_si = new_si
 		elseif new_si and new_si ~= old_si then
 			ts.last_si = new_si
@@ -536,6 +536,15 @@ script.on_event({defines.events.on_train_created},
    function (e)
 		table.insert(train_states, make_train_state(e.train))
    end
+)
+script.on_event({defines.events.on_train_schedule_changed},
+	function (e)
+		for _,ts in ipairs(train_states) do
+			if e.train == ts.train then
+				ts.last_si = e.train.schedule and e.train.schedule.current
+			end
+		end
+	end
 )
 script.on_event({defines.events.on_tick},
 	function (e)
