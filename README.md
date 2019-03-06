@@ -117,12 +117,12 @@ A train has this schedule:
  
 The track layout looks something like this. Note that the train travels clockwise in this loop, and stops 4 and 6 have the same name:
 
-    /--12---\-\-\
-    |       | | |
-    |       3 7 5
-    |       4 | 6
-    |       | | |
-    \-------/-/-/
+    /-------\--\--\
+    |  12   |  |  |
+    |      3| 7| 5|
+    |      4|  | 6|
+    |       |  |  |
+    \-------/--/--/
 
 As the train passes stops 1 and 2, it will decide to which of stations 3, 5, and 7 to goto:
 
