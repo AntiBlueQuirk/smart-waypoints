@@ -96,10 +96,12 @@ The mod provides only a few functions right now for getting information about th
    - Due to limitations, if you have two stops with the same name very close to each other, the script may get confused about which stop to read signals from.
  - `passengers(passspec)`
    - Counts up all the passengers in the train and returns their total number. If passspec is given, only passengers with that name are counted.
+ - `alert(message, icon, show_on_map)`
+   - Adds an alert to the map, as if created by a programmable speaker.
  - `id`
    - The numeric id of the train. This is the same number that "Read stopped train" at a train stop gives over the circuit network.
  - `speed`
-   - The current speed of the train, in m/s.
+   - The current speed of the train, in km/h.
 
 In addition, most of the Lua standard library is available, including but not limited to: `pairs`, `tonumber`, `math`, `string`, `table`, etc.
 

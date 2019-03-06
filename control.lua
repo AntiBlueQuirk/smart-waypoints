@@ -39,14 +39,6 @@ end
 --		end
 --   end
 --)
---script.on_event({defines.events.on_train_schedule_changed},
---   function (e)
---		e.name = nil; e.tick = nil
---		for index, player in pairs(game.connected_players) do  --loop through all online players on the server
---			player.print("on_train_schedule_changed: "..serpent.block(e))
---		end
---   end
---)
 
 
 local train_states = nil
@@ -189,8 +181,20 @@ function train_print(ts, ...)
 	local front = ts.train.front_stock
 	if front ~= nil then
 		local name = get_train_name(ts.train)
-		for _, player in pairs(front.force.players) do  --loop through all online players on the server
+		for _, player in pairs(front.force.players) do
 			player.print("[Smart Waypoints] ".. name .. " says: "..str)
+		end
+	end
+end
+function train_alert(ts, text, icon, show_on_map)
+	if icon == nil then icon = {type='virtual', name='signal-info'} end
+	if show_on_map == nil then show_on_map = true end
+	if type(icon) == 'string' then icon = {type=get_type_for_name(icon), name=icon} end
+	
+	local front = ts.train.front_stock
+	if front ~= nil then
+		for _, player in pairs(front.force.players) do
+			player.add_custom_alert(front, icon, text, show_on_map)
 		end
 	end
 end
@@ -270,6 +274,7 @@ function make_train_luae(ts)
 	if config.trains_can_print then
 		env.print       = function(...) train_print(ts, ...) end
 	end
+	env.alert       = function(text, icon, show_on_map) train_alert(ts, text, icon, show_on_map) end
 	env.item_count  = function(search) return train_item_count(ts, search) end
 	env.fluid_count = function(search) return train_fluid_count(ts, search) end
 	env.fuel_count  = function(search) return train_fuel_count(ts, search) end
@@ -348,7 +353,12 @@ function find_nearby_stop_with_name(surf, pos, name)
 	end
 	return closest
 end
-
+function get_type_for_name(name)
+	if game.item_prototypes[name] then return 'item' end
+	if game.fluid_prototypes[name] then return 'fluid' end
+	if game.virtual_signal_prototypes[name] then return 'virtual' end
+	return nil
+end
 function do_stop_passed_logic(ts, old_si)
 	local sch = ts.train.schedule
 	local schc = #sch.records
