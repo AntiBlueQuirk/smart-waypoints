@@ -520,7 +520,7 @@ function do_train_check(ts)
 	if sch then
 		local new_si = sch.current
 		local old_si = ts.last_si
-		if not old_si or old_si >= #sch.records then
+		if not old_si or old_si > #sch.records then
 			ts.last_si = new_si
 		elseif new_si and new_si ~= old_si then
 			ts.last_si = new_si
