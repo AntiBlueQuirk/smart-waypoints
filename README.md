@@ -2,6 +2,8 @@
 
 Download at [the mod portal](https://mods.factorio.com/mod/smart-waypoints), or search for it in game! (>= 0.17 required)
 
+Discuss at [the forum thread](https://forums.factorio.com/viewtopic.php?f=190&t=66895), or download the example map there to see the mod in action!
+
 Skip to the [example section](#example) for a quick overview.
 
 Smart Waypoints is a mod that enables waypoints with special names to control trains that go by, skipping around their schedule.
@@ -106,6 +108,8 @@ The mod provides only a few functions right now for getting information about th
 In addition, most of the Lua standard library is available, including but not limited to: `pairs`, `tonumber`, `math`, `string`, `table`, etc.
 
 ## Example
+
+See [the forum thread](https://forums.factorio.com/viewtopic.php?f=190&t=66895) for an example map.
 
 A train has this schedule:
 
